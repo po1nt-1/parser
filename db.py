@@ -1,15 +1,10 @@
-import csv
 import inspect
 import json
 import os
 import sys
-from collections import OrderedDict
-from pprint import pprint
-from time import time
 
 import pymongo
 from bson import errors
-from bson.objectid import ObjectId
 from pymongo import MongoClient
 
 
@@ -47,9 +42,18 @@ def insert(collection, data):
         raise local_error(str(e))
 
 
-def find(collection, request={}, skip=0, limit=0):
+def find(collection, fname="", phone="", nik="", skip=0, limit=0):
     try:
-        c = collection.find(request).skip(skip).limit(limit)
+        request = {}
+        if fname != "":
+            request.update({"fname": fname})
+        if phone != "":
+            request.update({"phone": phone})
+        if nik != "":
+            request.update({"nik": nik})
+
+        c = collection.find(request, skip=skip, limit=limit)
+
         data = [i for i in c]
     except pymongo.errors.OperationFailure as e:
         raise local_error(str(e))
@@ -57,7 +61,7 @@ def find(collection, request={}, skip=0, limit=0):
 
 
 def replace(collection, _id, data):
-    collection.replace_one({'_id': ObjectId(_id)}, data)
+    collection.replace_one({'_id': _id}, data)
 
 
 def delete(collection, data):
@@ -91,7 +95,6 @@ def import_data(collection, path):
             if counter % block == 0:
                 insert(collection, data)
                 data = []
-                print(counter / data_len)
 
             elif counter == data_len:
                 insert(collection, data)
@@ -100,24 +103,27 @@ def import_data(collection, path):
                 data = []
 
 
-def export_data(collection, path):
-    if not os.path.exists(path):
-        raise local_error("path doesn't exists")
-
-    pass
+def export_data(collection, path, data_in):
+    data_out = []
+    with open(path, 'w', encoding="utf-8") as f:
+        data_out.append("_id,name,fname,phone,uid,nik,wo\n")
+        for line in data_in:
+            data_out.append(f'{line["_id"]},{line["name"]},' +
+                            f'{line["fname"]},{line["phone"]},' +
+                            f'{line["uid"]},{line["nik"]},{line["wo"]}\n')
+        f.writelines(data_out)
 
 
 if __name__ == "__main__":
     try:
         collection = init_collection()
-        start = time()
-        import_data(collection, os.path.join(get_script_dir(),
-                                             "little_data.txt"))
+        # import_data(collection, os.path.join(get_script_dir(),
+        #                                      "little_data.txt"))
 
-        print("total time: ", (time() - start) / 60, "min")
+        response = find(collection, fname="random_fname998", skip=100, limit=2)
 
-        print("Всего:", end=" ")
-        print(collection.count_documents({}))
+        export_data(collection, os.path.join(
+            get_script_dir(), "response.csv"), response)
 
     except local_error as e:
         print("Error: " + str(e))
