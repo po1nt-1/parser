@@ -42,15 +42,17 @@ def insert(collection, data):
         raise local_error(str(e))
 
 
-def find(collection, fname="", phone="", nik="", skip=0, limit=0):
+def find(collection, _id="", fname="", phone="", nik="", skip=0, limit=0):
     try:
         request = {}
+        if _id != "":
+            request.update({"_id": str(_id)})
         if fname != "":
-            request.update({"fname": fname})
+            request.update({"fname": str(fname)})
         if phone != "":
-            request.update({"phone": phone})
+            request.update({"phone": str(phone)})
         if nik != "":
-            request.update({"nik": nik})
+            request.update({"nik": str(nik)})
 
         c = collection.find(request, skip=skip, limit=limit)
 
@@ -61,7 +63,10 @@ def find(collection, fname="", phone="", nik="", skip=0, limit=0):
 
 
 def replace(collection, _id, data):
-    collection.replace_one({'_id': _id}, data)
+    data_pull = find(collection, _id=_id, limit=1)[0]
+    data_pull.update(data)
+
+    collection.replace_one({'_id': str(_id)}, data_pull)
 
 
 def delete(collection, data):
@@ -112,18 +117,27 @@ def export_data(collection, path, data_in):
                             f'{line["fname"]},{line["phone"]},' +
                             f'{line["uid"]},{line["nik"]},{line["wo"]}\n')
         f.writelines(data_out)
+        data_in.clear()
+        data_out.clear()
 
 
-if __name__ == "__main__":
+def common_check(data):
+    if isinstance(data, str):
+        if "," in data or "|" in data or "\n" in data:
+            raise local_error(f"'{data}' contains an unsupported symbol")
+    else:
+        raise local_error(f"'{data}' is not a string")
+
+
+def main():
     try:
         collection = init_collection()
-        # import_data(collection, os.path.join(get_script_dir(),
-        #                                      "little_data.txt"))
-
-        response = find(collection, fname="random_fname998", skip=100, limit=2)
-
-        export_data(collection, os.path.join(
-            get_script_dir(), "response.csv"), response)
+        import_data(collection, os.path.join(get_script_dir(),
+                                             "little_data.txt"))
 
     except local_error as e:
         print("Error: " + str(e))
+
+
+if __name__ == "__main__":
+    main()
