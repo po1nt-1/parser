@@ -1,0 +1,786 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>675</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1200</width>
+    <height>675</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1200</width>
+    <height>675</height>
+   </size>
+  </property>
+  <property name="font">
+   <font>
+    <family>Open Sans Light</family>
+    <pointsize>12</pointsize>
+    <weight>75</weight>
+    <italic>false</italic>
+    <bold>true</bold>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>parser</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(27, 29, 35);
+color: rgb(27, 29, 35);</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <layout class="QGridLayout" name="gridLayout_7">
+      <item row="0" column="0">
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QLineEdit" name="lineEdit_fname">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+              <horstretch>240</horstretch>
+              <verstretch>40</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>240</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>240</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Open Sans Light</family>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <italic>false</italic>
+              <bold>true</bold>
+              <underline>false</underline>
+              <strikeout>false</strikeout>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QLineEdit {
+	border: 2px solid rgb(27, 29, 35);
+	border-radius: 20px;
+	color: #FFF;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: rgb(34, 36, 44);
+}
+QLineEdit:hover {
+	border: 2px solid rgb(48, 50, 62);
+}
+QLineEdit:focus {
+	border: 2px solid rgb(85, 170, 255);
+	background-color: rgb(43, 45, 56);
+}</string>
+            </property>
+            <property name="placeholderText">
+             <string>fname</string>
+            </property>
+            <property name="cursorMoveStyle">
+             <enum>Qt::LogicalMoveStyle</enum>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_nik">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+              <horstretch>240</horstretch>
+              <verstretch>40</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>240</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>240</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Open Sans Light</family>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <italic>false</italic>
+              <bold>true</bold>
+              <underline>false</underline>
+              <strikeout>false</strikeout>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QLineEdit {
+	border: 2px solid rgb(27, 29, 35);
+	border-radius: 20px;
+	color: #FFF;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: rgb(34, 36, 44);
+}
+QLineEdit:hover {
+	border: 2px solid rgb(48, 50, 62);
+}
+QLineEdit:focus {
+	border: 2px solid rgb(85, 170, 255);
+	background-color: rgb(43, 45, 56);
+}</string>
+            </property>
+            <property name="placeholderText">
+             <string>nik</string>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_phone">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+              <horstretch>240</horstretch>
+              <verstretch>40</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>240</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>240</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Open Sans Light</family>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <italic>false</italic>
+              <bold>true</bold>
+              <underline>false</underline>
+              <strikeout>false</strikeout>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QLineEdit {
+	border: 2px solid rgb(27, 29, 35);
+	border-radius: 20px;
+	color: #FFF;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: rgb(34, 36, 44);
+}
+QLineEdit:hover {
+	border: 2px solid rgb(48, 50, 62);
+}
+QLineEdit:focus {
+	border: 2px solid rgb(85, 170, 255);
+	background-color: rgb(43, 45, 56);
+}</string>
+            </property>
+            <property name="placeholderText">
+             <string>phone</string>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_1">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>240</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>240</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>240</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Open Sans Light</family>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <italic>false</italic>
+              <bold>true</bold>
+              <underline>false</underline>
+              <strikeout>false</strikeout>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+	border: 2px solid rgb(27, 29, 35);
+	border-radius: 20px;
+	color: #FFF;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: rgb(34, 36, 44);
+}
+QPushButton:hover {
+	border: 2px solid rgb(48, 50, 62);
+}
+QPushButton:focus {
+	border: 2px solid rgb(85, 170, 255);
+	background-color: rgb(43, 45, 56);
+}</string>
+            </property>
+            <property name="text">
+             <string>Импортировать в БД</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_2">
+            <property name="minimumSize">
+             <size>
+              <width>240</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>240</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Open Sans Light</family>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <italic>false</italic>
+              <bold>true</bold>
+              <underline>false</underline>
+              <strikeout>false</strikeout>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+	border: 2px solid rgb(27, 29, 35);
+	border-radius: 20px;
+	color: #FFF;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: rgb(34, 36, 44);
+}
+QPushButton:hover {
+	border: 2px solid rgb(48, 50, 62);
+}
+QPushButton:focus {
+	border: 2px solid rgb(85, 170, 255);
+	background-color: rgb(43, 45, 56);
+}</string>
+            </property>
+            <property name="text">
+             <string>Экспортировать в CSV</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="1">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QTableWidget" name="tableWidget">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>900</width>
+              <height>550</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>900</width>
+              <height>550</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Open Sans Light</family>
+              <pointsize>10</pointsize>
+              <weight>3</weight>
+              <italic>true</italic>
+              <bold>false</bold>
+              <underline>false</underline>
+              <strikeout>false</strikeout>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="contextMenuPolicy">
+             <enum>Qt::DefaultContextMenu</enum>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QTableWidget {
+	border: 2px solid rgb(27, 29, 35);
+	border-radius: 20px;
+	color: #FFF;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: rgb(34, 36, 44);
+}
+QTableWidget:hover {
+	border: 2px solid rgb(48, 50, 62);
+}
+QTableWidget:focus {
+	border: 2px solid rgb(85, 170, 255);
+	background-color: rgb(43, 45, 56);
+}</string>
+            </property>
+            <property name="rowCount">
+             <number>100</number>
+            </property>
+            <property name="columnCount">
+             <number>0</number>
+            </property>
+            <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+             <bool>false</bool>
+            </attribute>
+            <attribute name="verticalHeaderHighlightSections">
+             <bool>true</bool>
+            </attribute>
+            <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+             <bool>false</bool>
+            </attribute>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+            <row/>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QPushButton" name="pushButton_3">
+              <property name="minimumSize">
+               <size>
+                <width>160</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>160</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Open Sans Light</family>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+                <underline>false</underline>
+                <strikeout>false</strikeout>
+                <kerning>true</kerning>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
+	border: 2px solid rgb(27, 29, 35);
+	border-radius: 20px;
+	color: #FFF;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: rgb(34, 36, 44);
+}
+QPushButton:hover {
+	border: 2px solid rgb(48, 50, 62);
+}
+QPushButton:focus {
+	border: 2px solid rgb(85, 170, 255);
+	background-color: rgb(43, 45, 56);
+}</string>
+              </property>
+              <property name="text">
+               <string>Назад</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPlainTextEdit" name="plainTextEdit_pages_current">
+              <property name="minimumSize">
+               <size>
+                <width>70</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>70</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Open Sans Light</family>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+                <underline>false</underline>
+                <strikeout>false</strikeout>
+                <kerning>true</kerning>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPlainTextEdit {
+	border: 2px solid rgb(27, 29, 35);
+	border-radius: 20px;
+	color: #FFF;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: rgb(34, 36, 44);
+}
+QPlainTextEdit:hover {
+	border: 2px solid rgb(48, 50, 62);
+}
+QPlainTextEdit:focus {
+	border: 2px solid rgb(85, 170, 255);
+	background-color: rgb(43, 45, 56);
+}</string>
+              </property>
+              <property name="inputMethodHints">
+               <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+              <property name="plainText">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_pages_current">
+              <property name="minimumSize">
+               <size>
+                <width>70</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>70</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Open Sans Light</family>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+                <underline>false</underline>
+                <strikeout>false</strikeout>
+                <kerning>true</kerning>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel {
+	border: 2px solid rgb(27, 29, 35);
+	border-radius: 20px;
+	color: #FFF;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: rgb(34, 36, 44);
+}
+QLabel:hover {
+	border: 2px solid rgb(48, 50, 62);
+}
+QLabel:focus {
+	border: 2px solid rgb(85, 170, 255);
+	background-color: rgb(43, 45, 56);
+}</string>
+              </property>
+              <property name="text">
+               <string>из</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPlainTextEdit" name="plainTextEdit_pages_max">
+              <property name="minimumSize">
+               <size>
+                <width>70</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>70</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Open Sans Light</family>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+                <underline>false</underline>
+                <strikeout>false</strikeout>
+                <kerning>true</kerning>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPlainTextEdit {
+	border: 2px solid rgb(27, 29, 35);
+	border-radius: 20px;
+	color: #FFF;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: rgb(34, 36, 44);
+}
+QPlainTextEdit:hover {
+	border: 2px solid rgb(48, 50, 62);
+}
+QPlainTextEdit:focus {
+	border: 2px solid rgb(85, 170, 255);
+	background-color: rgb(43, 45, 56);
+}</string>
+              </property>
+              <property name="inputMethodHints">
+               <set>Qt::ImhMultiLine</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+              <property name="plainText">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_4">
+              <property name="minimumSize">
+               <size>
+                <width>160</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>160</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Open Sans Light</family>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+                <underline>false</underline>
+                <strikeout>false</strikeout>
+                <kerning>true</kerning>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
+	border: 2px solid rgb(27, 29, 35);
+	border-radius: 20px;
+	color: #FFF;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: rgb(34, 36, 44);
+}
+QPushButton:hover {
+	border: 2px solid rgb(48, 50, 62);
+}
+QPushButton:focus {
+	border: 2px solid rgb(85, 170, 255);
+	background-color: rgb(43, 45, 56);
+}</string>
+              </property>
+              <property name="text">
+               <string>Вперёд</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
