@@ -1,2 +1,2 @@
 pymongo
-PySide2
+pyside2
