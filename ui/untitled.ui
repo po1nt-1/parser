@@ -227,7 +227,7 @@ QLineEdit:focus {
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_1">
+           <widget class="QPushButton" name="button_import">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>240</horstretch>
@@ -284,7 +284,7 @@ QPushButton:focus {
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_2">
+           <widget class="QPushButton" name="button_export">
             <property name="minimumSize">
              <size>
               <width>240</width>
@@ -519,7 +519,7 @@ QTableWidget:focus {
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
-             <widget class="QPushButton" name="pushButton_3">
+             <widget class="QPushButton" name="button_back">
               <property name="minimumSize">
                <size>
                 <width>160</width>
@@ -723,7 +723,7 @@ QPlainTextEdit:focus {
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_4">
+             <widget class="QPushButton" name="button_forward">
               <property name="minimumSize">
                <size>
                 <width>160</width>

@@ -73,6 +73,17 @@ def delete(collection, data):
     collection.delete_one(data)
 
 
+def gen_new_csv_name():
+    path = os.path.join(get_script_dir(), "get_csv_here")
+    if not os.path.exists(path):
+        os.mkdir(path)
+    files = os.listdir(path)
+    i = 1
+    while f"result{i}.csv" in files:
+        i += 1
+    return f"result{i}.csv"
+
+
 def import_data(collection, path):
     if not os.path.exists(path):
         raise local_error("path doesn't exists")
@@ -88,6 +99,10 @@ def import_data(collection, path):
         counter = 0
         block = 100000
         data = []
+
+        from time import time
+        start = time()
+
         for line in f:
             counter += 1
             line = line[1:-2].split("|")[:7]
@@ -100,6 +115,7 @@ def import_data(collection, path):
             if counter % block == 0:
                 insert(collection, data)
                 data = []
+                print(time() - start)
 
             elif counter == data_len:
                 insert(collection, data)
@@ -133,7 +149,7 @@ def main():
     try:
         collection = init_collection()
         import_data(collection, os.path.join(get_script_dir(),
-                                             "little_data.txt"))
+                                             "test_small_data.txt"))
 
     except local_error as e:
         print("Error: " + str(e))

@@ -135,18 +135,18 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.lineEdit_phone)
 
-        self.pushButton_1 = QPushButton(self.centralwidget)
-        self.pushButton_1.setObjectName(u"pushButton_1")
+        self.button_import = QPushButton(self.centralwidget)
+        self.button_import.setObjectName(u"button_import")
         sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         sizePolicy2.setHorizontalStretch(240)
         sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.pushButton_1.sizePolicy().hasHeightForWidth())
-        self.pushButton_1.setSizePolicy(sizePolicy2)
-        self.pushButton_1.setMinimumSize(QSize(240, 40))
-        self.pushButton_1.setMaximumSize(QSize(240, 40))
-        self.pushButton_1.setFont(font1)
-        self.pushButton_1.setFocusPolicy(Qt.StrongFocus)
-        self.pushButton_1.setStyleSheet(u"QPushButton {\n"
+        sizePolicy2.setHeightForWidth(self.button_import.sizePolicy().hasHeightForWidth())
+        self.button_import.setSizePolicy(sizePolicy2)
+        self.button_import.setMinimumSize(QSize(240, 40))
+        self.button_import.setMaximumSize(QSize(240, 40))
+        self.button_import.setFont(font1)
+        self.button_import.setFocusPolicy(Qt.StrongFocus)
+        self.button_import.setStyleSheet(u"QPushButton {\n"
 "	border: 2px solid rgb(27, 29, 35);\n"
 "	border-radius: 20px;\n"
 "	color: #FFF;\n"
@@ -162,15 +162,15 @@ class Ui_MainWindow(object):
 "	background-color: rgb(43, 45, 56);\n"
 "}")
 
-        self.verticalLayout.addWidget(self.pushButton_1)
+        self.verticalLayout.addWidget(self.button_import)
 
-        self.pushButton_2 = QPushButton(self.centralwidget)
-        self.pushButton_2.setObjectName(u"pushButton_2")
-        self.pushButton_2.setMinimumSize(QSize(240, 40))
-        self.pushButton_2.setMaximumSize(QSize(240, 40))
-        self.pushButton_2.setFont(font1)
-        self.pushButton_2.setFocusPolicy(Qt.StrongFocus)
-        self.pushButton_2.setStyleSheet(u"QPushButton {\n"
+        self.button_export = QPushButton(self.centralwidget)
+        self.button_export.setObjectName(u"button_export")
+        self.button_export.setMinimumSize(QSize(240, 40))
+        self.button_export.setMaximumSize(QSize(240, 40))
+        self.button_export.setFont(font1)
+        self.button_export.setFocusPolicy(Qt.StrongFocus)
+        self.button_export.setStyleSheet(u"QPushButton {\n"
 "	border: 2px solid rgb(27, 29, 35);\n"
 "	border-radius: 20px;\n"
 "	color: #FFF;\n"
@@ -186,7 +186,7 @@ class Ui_MainWindow(object):
 "	background-color: rgb(43, 45, 56);\n"
 "}")
 
-        self.verticalLayout.addWidget(self.pushButton_2)
+        self.verticalLayout.addWidget(self.button_export)
 
 
         self.gridLayout_5.addLayout(self.verticalLayout, 0, 0, 1, 1)
@@ -240,12 +240,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.pushButton_3 = QPushButton(self.centralwidget)
-        self.pushButton_3.setObjectName(u"pushButton_3")
-        self.pushButton_3.setMinimumSize(QSize(160, 40))
-        self.pushButton_3.setMaximumSize(QSize(160, 40))
-        self.pushButton_3.setFont(font1)
-        self.pushButton_3.setStyleSheet(u"QPushButton {\n"
+        self.button_back = QPushButton(self.centralwidget)
+        self.button_back.setObjectName(u"button_back")
+        self.button_back.setMinimumSize(QSize(160, 40))
+        self.button_back.setMaximumSize(QSize(160, 40))
+        self.button_back.setFont(font1)
+        self.button_back.setStyleSheet(u"QPushButton {\n"
 "	border: 2px solid rgb(27, 29, 35);\n"
 "	border-radius: 20px;\n"
 "	color: #FFF;\n"
@@ -261,7 +261,7 @@ class Ui_MainWindow(object):
 "	background-color: rgb(43, 45, 56);\n"
 "}")
 
-        self.horizontalLayout.addWidget(self.pushButton_3)
+        self.horizontalLayout.addWidget(self.button_back)
 
         self.plainTextEdit_pages_current = QPlainTextEdit(self.centralwidget)
         self.plainTextEdit_pages_current.setObjectName(u"plainTextEdit_pages_current")
@@ -336,12 +336,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.plainTextEdit_pages_max)
 
-        self.pushButton_4 = QPushButton(self.centralwidget)
-        self.pushButton_4.setObjectName(u"pushButton_4")
-        self.pushButton_4.setMinimumSize(QSize(160, 40))
-        self.pushButton_4.setMaximumSize(QSize(160, 40))
-        self.pushButton_4.setFont(font1)
-        self.pushButton_4.setStyleSheet(u"QPushButton {\n"
+        self.button_forward = QPushButton(self.centralwidget)
+        self.button_forward.setObjectName(u"button_forward")
+        self.button_forward.setMinimumSize(QSize(160, 40))
+        self.button_forward.setMaximumSize(QSize(160, 40))
+        self.button_forward.setFont(font1)
+        self.button_forward.setStyleSheet(u"QPushButton {\n"
 "	border: 2px solid rgb(27, 29, 35);\n"
 "	border-radius: 20px;\n"
 "	color: #FFF;\n"
@@ -357,7 +357,7 @@ class Ui_MainWindow(object):
 "	background-color: rgb(43, 45, 56);\n"
 "}")
 
-        self.horizontalLayout.addWidget(self.pushButton_4)
+        self.horizontalLayout.addWidget(self.button_forward)
 
 
         self.verticalLayout_2.addLayout(self.horizontalLayout)
@@ -383,12 +383,12 @@ class Ui_MainWindow(object):
         self.lineEdit_fname.setPlaceholderText(QCoreApplication.translate("MainWindow", u"fname", None))
         self.lineEdit_nik.setPlaceholderText(QCoreApplication.translate("MainWindow", u"nik", None))
         self.lineEdit_phone.setPlaceholderText(QCoreApplication.translate("MainWindow", u"phone", None))
-        self.pushButton_1.setText(QCoreApplication.translate("MainWindow", u"\u0418\u043c\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 \u0411\u0414", None))
-        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"\u042d\u043a\u0441\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 CSV", None))
-        self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"\u041d\u0430\u0437\u0430\u0434", None))
+        self.button_import.setText(QCoreApplication.translate("MainWindow", u"\u0418\u043c\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 \u0411\u0414", None))
+        self.button_export.setText(QCoreApplication.translate("MainWindow", u"\u042d\u043a\u0441\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 CSV", None))
+        self.button_back.setText(QCoreApplication.translate("MainWindow", u"\u041d\u0430\u0437\u0430\u0434", None))
         self.plainTextEdit_pages_current.setPlainText(QCoreApplication.translate("MainWindow", u"0", None))
         self.label_pages_current.setText(QCoreApplication.translate("MainWindow", u"\u0438\u0437", None))
         self.plainTextEdit_pages_max.setPlainText(QCoreApplication.translate("MainWindow", u"0", None))
-        self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"\u0412\u043f\u0435\u0440\u0451\u0434", None))
+        self.button_forward.setText(QCoreApplication.translate("MainWindow", u"\u0412\u043f\u0435\u0440\u0451\u0434", None))
     # retranslateUi
 
