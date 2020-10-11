@@ -8,16 +8,20 @@ from bson import errors
 from pymongo import MongoClient
 from PySide2.QtCore import QThread
 
+from main import Transfer_to_main
+
 g_path_to_csv = ""
 
-g_max_value = 0
+g_max_value = 1
 g_current_value = 0
 
+helper = Transfer_to_main()
 
-class Transfer():
-    def __init__(self, value):
+
+class Transfer_to_db():
+    def teleport(self, path):
         global g_path_to_csv
-        g_path_to_csv = value
+        g_path_to_csv = path
 
 
 class WorkerThread(QThread):
@@ -35,12 +39,15 @@ class local_error(Exception):
     pass
 
 
-def percent(cur_val, max_val):
-    if max_val == 0:
-        return 100.0
+def get_percent():
+    global g_current_value
+    global g_max_value
 
-    per = 100 * float(cur_val)/float(max_val)
-    return float(str(per).split(".")[0] + "." + str(per).split(".")[1][:1])
+    if g_max_value == 0:
+        return 100
+
+    per = 100 * float(g_current_value)/float(g_max_value)
+    return int(per)
 
 
 def get_script_dir(follow_symlinks=True):
@@ -119,6 +126,8 @@ def import_data(collection, path):
     global g_max_value
     global g_current_value
 
+    global helper
+
     if not os.path.exists(path):
         raise local_error("path doesn't exists")
 
@@ -126,9 +135,10 @@ def import_data(collection, path):
 
     headers = ['_id', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
 
-    print("считаю длину файла...")
+    print("считываю длину файла..", end="")
     with open(path, 'r', encoding="Windows-1251") as f:
         g_max_value = sum(1 for _ in f) - 1
+        print(".")
 
     with open(path, 'r', encoding="Windows-1251") as f:
         f.readline()
@@ -139,7 +149,7 @@ def import_data(collection, path):
         from time import time
         start = time()
 
-        print(percent(0, g_max_value), "%")
+        helper.teleport(0, g_max_value)
 
         for line in f:
 
@@ -159,7 +169,8 @@ def import_data(collection, path):
                 insert(collection, data)
 
                 data = []
-                print(percent(g_current_value, g_max_value), "%")
+
+                helper.teleport(g_current_value, g_max_value)
 
             elif g_current_value >= g_max_value:
                 data.sort(key=lambda field: field['_id'])
@@ -169,7 +180,7 @@ def import_data(collection, path):
                 data.clear()
                 data = []
 
-    print(percent(g_current_value, g_max_value), "%")
+    helper.teleport(g_current_value, g_max_value)
     eee = str((time() - start) / 60).split(".")
     print(eee[0] + "." + eee[1][:3] + " min")
 
