@@ -258,20 +258,20 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
 
-        self.progress_import = QProgressBar(self.centralwidget)
-        self.progress_import.setObjectName(u"progress_import")
-        sizePolicy.setHeightForWidth(self.progress_import.sizePolicy().hasHeightForWidth())
-        self.progress_import.setSizePolicy(sizePolicy)
-        self.progress_import.setMinimumSize(QSize(810, 40))
-        self.progress_import.setMaximumSize(QSize(810, 40))
+        self.progress_barchik = QProgressBar(self.centralwidget)
+        self.progress_barchik.setObjectName(u"progress_barchik")
+        sizePolicy.setHeightForWidth(self.progress_barchik.sizePolicy().hasHeightForWidth())
+        self.progress_barchik.setSizePolicy(sizePolicy)
+        self.progress_barchik.setMinimumSize(QSize(810, 40))
+        self.progress_barchik.setMaximumSize(QSize(810, 40))
         font3 = QFont()
         font3.setFamily(u"Open Sans ExtraBold")
         font3.setPointSize(25)
         font3.setBold(True)
         font3.setWeight(75)
-        self.progress_import.setFont(font3)
-        self.progress_import.setCursor(QCursor(Qt.BusyCursor))
-        self.progress_import.setStyleSheet(u"QProgressBar {\n"
+        self.progress_barchik.setFont(font3)
+        self.progress_barchik.setCursor(QCursor(Qt.BusyCursor))
+        self.progress_barchik.setStyleSheet(u"QProgressBar {\n"
 "    border: 0.5px solid rgb(48, 50, 62);\n"
 "    text-align: right;\n"
 "}\n"
@@ -280,10 +280,10 @@ class Ui_MainWindow(object):
 "    width: 5px;\n"
 "    margin: 0.5px;\n"
 "}")
-        self.progress_import.setValue(0)
-        self.progress_import.setTextDirection(QProgressBar.TopToBottom)
+        self.progress_barchik.setValue(0)
+        self.progress_barchik.setTextDirection(QProgressBar.TopToBottom)
 
-        self.horizontalLayout_2.addWidget(self.progress_import)
+        self.horizontalLayout_2.addWidget(self.progress_barchik)
 
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 

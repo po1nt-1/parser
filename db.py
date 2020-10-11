@@ -6,14 +6,41 @@ import sys
 import pymongo
 from bson import errors
 from pymongo import MongoClient
+from PySide2.QtCore import QThread
 
+g_path_to_csv = ""
 
 g_max_value = 0
 g_current_value = 0
 
 
+class Transfer():
+    def __init__(self, value):
+        global g_path_to_csv
+        g_path_to_csv = value
+
+
+class WorkerThread(QThread):
+    def __init__(self, parent=None):
+        super(WorkerThread, self).__init__(parent)
+
+    def run(self):
+        collection = init_collection()
+        import_data(collection, g_path_to_csv)
+
+        return
+
+
 class local_error(Exception):
     pass
+
+
+def percent(cur_val, max_val):
+    if max_val == 0:
+        return 100.0
+
+    per = 100 * float(cur_val)/float(max_val)
+    return float(str(per).split(".")[0] + "." + str(per).split(".")[1][:1])
 
 
 def get_script_dir(follow_symlinks=True):
@@ -89,8 +116,8 @@ def gen_new_csv_name():
 
 
 def import_data(collection, path):
-    global g_current_value
     global g_max_value
+    global g_current_value
 
     if not os.path.exists(path):
         raise local_error("path doesn't exists")
@@ -112,6 +139,8 @@ def import_data(collection, path):
         from time import time
         start = time()
 
+        print(percent(0, g_max_value), "%")
+
         for line in f:
 
             g_current_value += 1
@@ -128,10 +157,9 @@ def import_data(collection, path):
             if g_current_value % block == 0:
                 data.sort(key=lambda field: field['_id'])
                 insert(collection, data)
-                print("ПРОИЗОШЁЛ ДАМП!!")
-                g_current_value += 1
 
                 data = []
+                print(percent(g_current_value, g_max_value), "%")
 
             elif g_current_value >= g_max_value:
                 data.sort(key=lambda field: field['_id'])
@@ -140,8 +168,10 @@ def import_data(collection, path):
                 iter_data.clear()
                 data.clear()
                 data = []
-                eee = str((time() - start) / 60).split(".")
-                print(eee[0] + "." + eee[1][:3] + " min")
+
+    print(percent(g_current_value, g_max_value), "%")
+    eee = str((time() - start) / 60).split(".")
+    print(eee[0] + "." + eee[1][:3] + " min")
 
 
 def export_data(collection, path, data_in):
@@ -169,8 +199,8 @@ def main():
     try:
         collection = init_collection()
         import_data(collection, os.path.join(get_script_dir(),
-                                             # "test_small_data.txt"))
-                                             "little_data.txt"))
+                                             "test_small_data.txt"))
+        # "little_data.txt"))
 
     except local_error as e:
         print("Error: " + str(e))
