@@ -64,6 +64,7 @@ class Ui_MainWindow(object):
         self.tableWidget.setSizePolicy(sizePolicy)
         self.tableWidget.setMinimumSize(QSize(810, 450))
         self.tableWidget.setMaximumSize(QSize(810, 450))
+        self.tableWidget.setSizeIncrement(QSize(0, 0))
         font1 = QFont()
         font1.setFamily(u"Open Sans Light")
         font1.setPointSize(10)
@@ -92,9 +93,12 @@ class Ui_MainWindow(object):
 "QTableWidget QTableCornerButton::section {\n"
 "    border: 2px solid rgb(48, 50, 62);\n"
 "}")
+        self.tableWidget.setGridStyle(Qt.DashLine)
+        self.tableWidget.setSortingEnabled(False)
         self.tableWidget.setRowCount(100)
         self.tableWidget.setColumnCount(7)
         self.tableWidget.horizontalHeader().setVisible(True)
+        self.tableWidget.horizontalHeader().setMinimumSectionSize(112)
         self.tableWidget.horizontalHeader().setProperty("showSortIndicator", False)
         self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.verticalHeader().setHighlightSections(True)
@@ -296,6 +300,52 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addItem(self.verticalSpacer_5)
 
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalLayout_4.setSizeConstraint(QLayout.SetDefaultConstraint)
+        self.horizontalSpacer_5 = QSpacerItem(718, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_5)
+
+        self.button_stop = QPushButton(self.centralwidget)
+        self.button_stop.setObjectName(u"button_stop")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.button_stop.sizePolicy().hasHeightForWidth())
+        self.button_stop.setSizePolicy(sizePolicy1)
+        self.button_stop.setMinimumSize(QSize(160, 40))
+        self.button_stop.setMaximumSize(QSize(160, 40))
+        self.button_stop.setFont(font2)
+        self.button_stop.setStyleSheet(u"QPushButton {\n"
+"	border: 2px solid rgb(27, 29, 35);\n"
+"	border-radius: 20px;\n"
+"	color: #FFF;\n"
+"	padding-left: 20px;\n"
+"	padding-right: 20px;\n"
+"	background-color: rgb(170, 0, 0);\n"
+"}\n"
+"QPushButton:hover {\n"
+"	border: 2px solid rgb(48, 50, 62);\n"
+"}\n"
+"QPushButton:focus {\n"
+"	border: 2px solid rgb(85, 170, 255);\n"
+"	background-color: rgb(200, 0, 0);\n"
+"}")
+
+        self.horizontalLayout_4.addWidget(self.button_stop)
+
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_6)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_4)
+
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_2.addItem(self.verticalSpacer_4)
+
 
         self.gridLayout_5.addLayout(self.verticalLayout_2, 0, 1, 1, 1)
 
@@ -303,11 +353,11 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.lineEdit_fname = QLineEdit(self.centralwidget)
         self.lineEdit_fname.setObjectName(u"lineEdit_fname")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
-        sizePolicy1.setHorizontalStretch(240)
-        sizePolicy1.setVerticalStretch(40)
-        sizePolicy1.setHeightForWidth(self.lineEdit_fname.sizePolicy().hasHeightForWidth())
-        self.lineEdit_fname.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        sizePolicy2.setHorizontalStretch(240)
+        sizePolicy2.setVerticalStretch(40)
+        sizePolicy2.setHeightForWidth(self.lineEdit_fname.sizePolicy().hasHeightForWidth())
+        self.lineEdit_fname.setSizePolicy(sizePolicy2)
         self.lineEdit_fname.setMinimumSize(QSize(240, 40))
         self.lineEdit_fname.setMaximumSize(QSize(240, 40))
         self.lineEdit_fname.setFont(font2)
@@ -333,8 +383,8 @@ class Ui_MainWindow(object):
 
         self.lineEdit_nik = QLineEdit(self.centralwidget)
         self.lineEdit_nik.setObjectName(u"lineEdit_nik")
-        sizePolicy1.setHeightForWidth(self.lineEdit_nik.sizePolicy().hasHeightForWidth())
-        self.lineEdit_nik.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.lineEdit_nik.sizePolicy().hasHeightForWidth())
+        self.lineEdit_nik.setSizePolicy(sizePolicy2)
         self.lineEdit_nik.setMinimumSize(QSize(240, 40))
         self.lineEdit_nik.setMaximumSize(QSize(240, 40))
         self.lineEdit_nik.setFont(font2)
@@ -359,8 +409,8 @@ class Ui_MainWindow(object):
 
         self.lineEdit_phone = QLineEdit(self.centralwidget)
         self.lineEdit_phone.setObjectName(u"lineEdit_phone")
-        sizePolicy1.setHeightForWidth(self.lineEdit_phone.sizePolicy().hasHeightForWidth())
-        self.lineEdit_phone.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.lineEdit_phone.sizePolicy().hasHeightForWidth())
+        self.lineEdit_phone.setSizePolicy(sizePolicy2)
         self.lineEdit_phone.setMinimumSize(QSize(240, 40))
         self.lineEdit_phone.setMaximumSize(QSize(240, 40))
         self.lineEdit_phone.setFont(font2)
@@ -385,11 +435,11 @@ class Ui_MainWindow(object):
 
         self.button_import = QPushButton(self.centralwidget)
         self.button_import.setObjectName(u"button_import")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        sizePolicy2.setHorizontalStretch(240)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.button_import.sizePolicy().hasHeightForWidth())
-        self.button_import.setSizePolicy(sizePolicy2)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy3.setHorizontalStretch(240)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.button_import.sizePolicy().hasHeightForWidth())
+        self.button_import.setSizePolicy(sizePolicy3)
         self.button_import.setMinimumSize(QSize(240, 40))
         self.button_import.setMaximumSize(QSize(240, 40))
         self.button_import.setFont(font2)
@@ -459,6 +509,7 @@ class Ui_MainWindow(object):
         self.label_pages_current.setText(QCoreApplication.translate("MainWindow", u"\u0438\u0437", None))
         self.plainTextEdit_pages_max.setPlainText(QCoreApplication.translate("MainWindow", u"0", None))
         self.button_forward.setText(QCoreApplication.translate("MainWindow", u"\u0412\u043f\u0435\u0440\u0451\u0434", None))
+        self.button_stop.setText(QCoreApplication.translate("MainWindow", u"\u0421\u0442\u043e\u043f", None))
         self.lineEdit_fname.setPlaceholderText(QCoreApplication.translate("MainWindow", u"fname", None))
         self.lineEdit_nik.setPlaceholderText(QCoreApplication.translate("MainWindow", u"nik", None))
         self.lineEdit_phone.setPlaceholderText(QCoreApplication.translate("MainWindow", u"phone", None))
