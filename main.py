@@ -2,6 +2,7 @@ import inspect
 import json
 import multiprocessing as mp
 import os
+import re
 import sys
 import time
 
@@ -29,6 +30,9 @@ g_connection = ""
 
 headers = ['_id', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
 
+g_page_number = 1
+g_pages_total = 1
+
 
 class Local_error(Exception):
     pass
@@ -49,11 +53,12 @@ class Worker_bar(QThread):
             if g_active_import:
                 self.updateProgress.emit(get_percent())
 
+        print("если это видно, значит проблема с QThread решилась")
 
-class Worker_importer(QThread):
 
+class Worker_Boris(QThread):
     def __init__(self, parent=None):
-        super(Worker_importer, self).__init__(parent)
+        super(Worker_Boris, self).__init__(parent)
 
     def run(self):
         global g_overload_param
@@ -71,11 +76,12 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
         super(MyQtApp, self).__init__(parent)
         self.setupUi(self)
 
-        self.worker_importer = Worker_importer()
+        self.worker_importer = Worker_Boris()
         self.worker_bar = Worker_bar()
         init_collection()
 
         self.progress_barchik.setValue(0)
+        self.notifier = QMessageBox()
 
         self.button_import.clicked.connect(self.open_file_browser)
         self.button_show.clicked.connect(self.show_table)
@@ -84,60 +90,96 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
         self.button_back.clicked.connect(self.back)
         self.button_stop.clicked.connect(self.stop)
 
-    #           ###  ###############  #           ###
-    #       ####     #                #       ####
-    # ######         ###############  # ######
-    #       ####     #                #       ####
-    #           ###  ###############  #           ###
+        #           ###  ###############  #           ###
+        #       ####     #                #       ####
+        # ######         ###############  # ######
+        #       ####     #                #       ####
+        #           ###  ###############  #           ###
 
     def open_file_browser(self):
-        global g_max_value
-        global g_current_value
-        global g_path_to_csv
-        global g_overload_param
+        try:
+            global g_path_to_csv
+            global g_overload_param
 
-        global g_active_import
+            global g_active_import
 
-        g_path_to_csv = QFileDialog.getOpenFileName()[0]
+            global g_page_number
+            global g_pages_total
 
-        if not g_path_to_csv:
-            QMessageBox().about(self, " ", "Путь не выбран")
-        else:
-            g_active_import = False
-            self.progress_barchik.setValue(0)
-            self.worker_bar.updateProgress.connect(self.setProgress)
+            g_path_to_csv = QFileDialog.getOpenFileName()[0]
 
-            g_overload_param = "import"
-            self.worker_importer.start()
-            self.worker_bar.start()
+            if not g_path_to_csv:
+                raise Local_error("Путь не выбран")
+            else:
+                g_page_number = 1
+                g_pages_total = 1
+                self.lineEdit_pages_cur.setText(str(g_page_number))
+                self.lineEdit_pages_max.setText(str(g_pages_total))
+                self.tableWidget.clear()
+
+                g_active_import = False
+
+                self.progress_barchik.setValue(0)
+                self.worker_bar.updateProgress.connect(self.setProgress)
+
+                g_overload_param = "import"
+                self.worker_importer.start()
+                self.worker_bar.start()
+        except Local_error as e:
+            self.notifier.about(self, " ", str(e))
 
     def setProgress(self, progress):
-        if g_active_import:
-            self.progress_barchik.setValue(progress)
+        try:
+            global g_active_import
+            if g_active_import:
+                self.progress_barchik.setValue(progress)
+        except Local_error as e:
+            self.notifier.about(self, " ", str(e))
 
     def show_table(self):
-        global g_connection
-
-        print("показаТЬ")
-
-        self.fname = self.lineEdit_fname.text()
-        self.phone = self.lineEdit_phone.text()
-        self.nik = self.lineEdit_nik.text()
-
         try:
+            global g_connection
+            global g_page_number
+            global g_pages_total
+
+            g_page_number = 1
+            g_pages_total = 1
+
+            self.tableWidget.clear()
+            self.tableWidget.setHorizontalHeaderLabels(headers)
+
+            self.fname = self.lineEdit_fname.text()
+            self.phone = self.lineEdit_phone.text()
+            self.nik = self.lineEdit_nik.text()
+
             input_check(self.fname)
             input_check(self.phone)
             input_check(self.nik)
-        except Local_error as e:
-            QMessageBox().about(self, " ", str(e))
-            return
 
-        if self.fname or self.phone or self.nik:
-            self.tableWidget.setHorizontalHeaderLabels(headers)
-            response = find(g_connection,
-                            fname=self.fname,
-                            phone=self.phone,
-                            nik=self.nik)
+            if self.fname or self.phone or self.nik:
+                response = find(g_connection,
+                                fname=self.fname,
+                                phone=self.phone,
+                                nik=self.nik)
+                collection_len = len(response)
+            else:
+                response = find(g_connection, skip=0, limit=100)
+                collection_len = g_connection.estimated_document_count()
+
+            if len(response) == 0:
+                raise Local_error("Данные отсутствуют")
+
+            if collection_len / 100 > 1:
+                if collection_len % 100 == 0:
+                    g_pages_total = collection_len // 100
+                else:
+                    g_pages_total = collection_len // 100 + 1
+            else:
+                g_pages_total = 1
+
+            self.lineEdit_pages_cur.setText(str(g_page_number))
+            self.lineEdit_pages_max.setText(str(g_pages_total))
+
             for row_number, row_value in enumerate(response):
                 for item_number, item_value in enumerate(row_value):
                     self.tableWidget.setItem(
@@ -147,20 +189,50 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                     self.tableWidget.horizontalHeaderItem(
                         item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
             self.tableWidget.resizeColumnsToContents()
-        else:
-            QMessageBox().about(self, " ", "Пустой запрос")
-            return
-
-        print("показаЛ")
+        except Local_error as e:
+            self.notifier.about(self, " ", str(e))
 
     def export(self):
-        print("экспорт")
+        try:
+            print("экспорт")
+        except Local_error as e:
+            self.notifier.about(self, " ", str(e))
 
     def forward(self):
-        print("вперёд")
+        try:
+            global g_connection
+            global g_page_number
+            global g_pages_total
+
+            g_page_number += 1
+
+            if (g_page_number < 1) or (g_page_number > g_pages_total):
+                g_page_number -= 1
+                raise Local_error("Incorrect page number")
+
+            page_begin = 100 * g_page_number - 100
+
+            response = find(g_connection, skip=page_begin, limit=100)
+
+            self.lineEdit_pages_cur.setText(str(g_page_number))
+
+            for row_number, row_value in enumerate(response):
+                for item_number, item_value in enumerate(row_value):
+                    self.tableWidget.setItem(
+                        row_number, item_number, QTableWidgetItem(
+                            list(row_value.values())[item_number])
+                    )
+                    self.tableWidget.horizontalHeaderItem(
+                        item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
+            self.tableWidget.resizeColumnsToContents()
+        except Local_error as e:
+            self.notifier.about(self, " ", str(e))
 
     def back(self):
-        print("назад")
+        try:
+            print("назад")
+        except Local_error as e:
+            self.notifier.about(self, " ", str(e))
 
     def stop(self):
         global g_active_import
@@ -222,7 +294,8 @@ def find(collection, _id="", fname="", phone="", nik="", skip=0, limit=0):
         if nik != "":
             request.update({"nik": str(nik)})
 
-        c = collection.find(request, skip=skip, limit=limit)
+        c = collection.find(request, skip=skip, limit=limit,
+                            allow_partial_results=True)
 
         data = [i for i in c]
     except pymongo.errors.OperationFailure as e:
@@ -253,14 +326,13 @@ def import_data(collection, path):
             raise Local_error("path doesn't exists")
 
         collection.drop()
-
-        print("считываю длину файла..", end="")
-        g_max_value = 100
         g_current_value = 1
+        g_max_value = 100
+        print("считываю длину файла..", end="")
         with open(path, 'r', encoding="Windows-1251") as f:
             g_max_value = sum(1 for _ in f) - 1
             print(".")
-        g_current_value = 0
+
         with open(path, 'r', encoding="Windows-1251") as f:
             f.readline()
 
@@ -269,7 +341,7 @@ def import_data(collection, path):
 
             from time import time
             start = time()
-
+            g_current_value = 0
             for line in f:
                 g_current_value += 1
                 if line.isspace() or "|" not in line:
@@ -334,7 +406,8 @@ def input_check(data):
     if isinstance(data, str):
         if "," in data or "|" in data or "\n" in data:
             raise Local_error(
-                f"'{data}' contains an unsupported symbol: \n{{',' '|' '\\n'}}")
+                f"'{data}' contains an unsupported" +
+                "symbol: \n{','; '|'; '\\n'}")
     else:
         raise Local_error(f"'{data}' is not a string")
 
