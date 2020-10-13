@@ -17,14 +17,20 @@ import front
 
 g_path_to_csv = ""
 
-g_max_value = 1
+g_overload_param = ""
+
+g_max_value = 2
 g_current_value = 0
 
 g_active_import = False
 g_active_export = False
 
+g_connection = ""
 
-class local_error(Exception):
+headers = ['_id', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
+
+
+class Local_error(Exception):
     pass
 
 
@@ -32,7 +38,7 @@ class Worker_bar(QThread):
     updateProgress = Signal(int)
 
     def __init__(self, parent=None):
-        QThread.__init__(self)
+        super(Worker_bar, self).__init__(parent)
 
     def run(self):
         global g_active_import
@@ -45,14 +51,19 @@ class Worker_bar(QThread):
 
 
 class Worker_importer(QThread):
+
     def __init__(self, parent=None):
         super(Worker_importer, self).__init__(parent)
 
     def run(self):
+        global g_overload_param
         global g_path_to_csv
+        global g_connection
 
-        collection = init_collection()
-        import_data(collection, g_path_to_csv)
+        if g_overload_param == "import":
+            import_data(g_connection, g_path_to_csv)
+        elif g_overload_param == "export":
+            pass  # export
 
 
 class MyQtApp(front.Ui_MainWindow, QMainWindow):
@@ -62,48 +73,94 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
         self.worker_importer = Worker_importer()
         self.worker_bar = Worker_bar()
+        init_collection()
 
         self.progress_barchik.setValue(0)
 
         self.button_import.clicked.connect(self.open_file_browser)
+        self.button_show.clicked.connect(self.show_table)
         self.button_export.clicked.connect(self.export)
-        self.button_stop.clicked.connect(self.stop)
-        self.button_back.clicked.connect(self.back)
         self.button_forward.clicked.connect(self.forward)
+        self.button_back.clicked.connect(self.back)
+        self.button_stop.clicked.connect(self.stop)
+
+    #           ###  ###############  #           ###
+    #       ####     #                #       ####
+    # ######         ###############  # ######
+    #       ####     #                #       ####
+    #           ###  ###############  #           ###
 
     def open_file_browser(self):
         global g_max_value
         global g_current_value
         global g_path_to_csv
+        global g_overload_param
 
         global g_active_import
-
-        g_active_import = False
-
-        print("open_file_browser")
 
         g_path_to_csv = QFileDialog.getOpenFileName()[0]
 
         if not g_path_to_csv:
-            print("файл не был выбран")
+            QMessageBox().about(self, " ", "Путь не выбран")
         else:
-
+            g_active_import = False
+            self.progress_barchik.setValue(0)
             self.worker_bar.updateProgress.connect(self.setProgress)
 
+            g_overload_param = "import"
             self.worker_importer.start()
             self.worker_bar.start()
 
     def setProgress(self, progress):
-        self.progress_barchik.setValue(progress)
+        if g_active_import:
+            self.progress_barchik.setValue(progress)
+
+    def show_table(self):
+        global g_connection
+
+        print("показаТЬ")
+
+        self.fname = self.lineEdit_fname.text()
+        self.phone = self.lineEdit_phone.text()
+        self.nik = self.lineEdit_nik.text()
+
+        try:
+            input_check(self.fname)
+            input_check(self.phone)
+            input_check(self.nik)
+        except Local_error as e:
+            QMessageBox().about(self, " ", str(e))
+            return
+
+        if self.fname or self.phone or self.nik:
+            self.tableWidget.setHorizontalHeaderLabels(headers)
+            response = find(g_connection,
+                            fname=self.fname,
+                            phone=self.phone,
+                            nik=self.nik)
+            for row_number, row_value in enumerate(response):
+                for item_number, item_value in enumerate(row_value):
+                    self.tableWidget.setItem(
+                        row_number, item_number, QTableWidgetItem(
+                            list(row_value.values())[item_number])
+                    )
+                    self.tableWidget.horizontalHeaderItem(
+                        item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
+            self.tableWidget.resizeColumnsToContents()
+        else:
+            QMessageBox().about(self, " ", "Пустой запрос")
+            return
+
+        print("показаЛ")
 
     def export(self):
-        print("ну экспорт")
-
-    def back(self):
-        print("ну назад")
+        print("экспорт")
 
     def forward(self):
-        print("ну вперёд")
+        print("вперёд")
+
+    def back(self):
+        print("назад")
 
     def stop(self):
         global g_active_import
@@ -111,15 +168,6 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
         g_active_import = False
         g_active_export = False
-
-
-# class Worker_exporter(QThread):
-#     def __init__(self, parent=None):
-#         super(Worker_exporter, self).__init__(parent)
-
-#     def run(self):
-#         collection = init_collection()
-#         export_data()
 
 
 def get_percent():
@@ -146,11 +194,10 @@ def get_script_dir(follow_symlinks=True):
 
 
 def init_collection():
+    global g_connection
     client = MongoClient()
     db = client["db"]
-    collection = db["collection"]
-
-    return collection
+    g_connection = db["collection"]
 
 
 def insert(collection, data):
@@ -160,7 +207,7 @@ def insert(collection, data):
         else:
             collection.insert_many(data)
     except errors.InvalidDocument as e:
-        raise local_error(str(e))
+        raise Local_error(str(e))
 
 
 def find(collection, _id="", fname="", phone="", nik="", skip=0, limit=0):
@@ -179,7 +226,7 @@ def find(collection, _id="", fname="", phone="", nik="", skip=0, limit=0):
 
         data = [i for i in c]
     except pymongo.errors.OperationFailure as e:
-        raise local_error(str(e))
+        raise Local_error(str(e))
     return data
 
 
@@ -194,41 +241,29 @@ def delete(collection, data):
     collection.delete_one(data)
 
 
-def gen_new_csv_name():
-    path = os.path.join(get_script_dir(), "get_csv_here")
-    if not os.path.exists(path):
-        os.mkdir(path)
-    files = os.listdir(path)
-    i = 1
-    while f"result{i}.csv" in files:
-        i += 1
-    return f"result{i}.csv"
-
-
 def import_data(collection, path):
     global g_max_value
     global g_current_value
-
     global g_active_import
-
-    g_active_import = True
+    global headers
 
     try:
+        g_active_import = True
         if not os.path.exists(path):
-            raise local_error("path doesn't exists")
+            raise Local_error("path doesn't exists")
 
         collection.drop()
 
-        headers = ['_id', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
-
         print("считываю длину файла..", end="")
+        g_max_value = 100
+        g_current_value = 1
         with open(path, 'r', encoding="Windows-1251") as f:
             g_max_value = sum(1 for _ in f) - 1
             print(".")
-
+        g_current_value = 0
         with open(path, 'r', encoding="Windows-1251") as f:
             f.readline()
-            g_current_value = 0
+
             block = 10000
             data = []
 
@@ -237,7 +272,7 @@ def import_data(collection, path):
 
             for line in f:
                 g_current_value += 1
-                if line.isspace():
+                if line.isspace() or "|" not in line:
                     continue
 
                 line = line[1:-2].split("|")[:7]
@@ -248,13 +283,13 @@ def import_data(collection, path):
                 data.append(iter_data)
 
                 if g_current_value % block == 0:
-                    data.sort(key=lambda field: field['_id'])
+                    data.sort(key=lambda field: int(field['_id']))
                     insert(collection, data)
 
                     data = []
 
                 elif g_current_value >= g_max_value:
-                    data.sort(key=lambda field: field['_id'])
+                    data.sort(key=lambda field: int(field['_id']))
                     insert(collection, data)
 
                     iter_data = {}
@@ -271,7 +306,7 @@ def import_data(collection, path):
         g_active_import = False
 
 
-def export_data(collection, path, data_in):
+def export_data_master(collection, path, data_in):
     data_out = []
     with open(path, 'w', encoding="utf-8") as f:
         data_out.append("_id,name,fname,phone,uid,nik,wo\n")
@@ -284,12 +319,24 @@ def export_data(collection, path, data_in):
         data_out.clear()
 
 
-def common_check(data):
+def gen_new_csv_name():
+    path = os.path.join(get_script_dir(), "get_csv_here")
+    if not os.path.exists(path):
+        os.mkdir(path)
+    files = os.listdir(path)
+    i = 1
+    while f"result{i}.csv" in files:
+        i += 1
+    return f"result{i}.csv"
+
+
+def input_check(data):
     if isinstance(data, str):
         if "," in data or "|" in data or "\n" in data:
-            raise local_error(f"'{data}' contains an unsupported symbol")
+            raise Local_error(
+                f"'{data}' contains an unsupported symbol: \n{{',' '|' '\\n'}}")
     else:
-        raise local_error(f"'{data}' is not a string")
+        raise Local_error(f"'{data}' is not a string")
 
 
 def main():
