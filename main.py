@@ -148,19 +148,26 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
             self.tableWidget.clear()
             self.tableWidget.setHorizontalHeaderLabels(headers)
 
+            self.name = self.lineEdit_name.text()
             self.fname = self.lineEdit_fname.text()
             self.phone = self.lineEdit_phone.text()
+            self.uid = self.lineEdit_uid.text()
             self.nik = self.lineEdit_nik.text()
+            self.wo = self.lineEdit_wo.text()
 
             input_check(self.fname)
             input_check(self.phone)
             input_check(self.nik)
 
-            if self.fname or self.phone or self.nik:
+            if self.name or self.fname or self.phone or \
+                    self.uid or self.nik or self.wo:
                 response = find(g_connection,
+                                name=self.name,
                                 fname=self.fname,
                                 phone=self.phone,
-                                nik=self.nik)
+                                uid=self.uid,
+                                nik=self.nik,
+                                wo=self.wo)
                 collection_len = len(response)
             else:
                 response = find(g_connection, skip=0, limit=100)
@@ -206,13 +213,21 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
             g_page_number += 1
 
-            if (g_page_number < 1) or (g_page_number > g_pages_total):
+            if g_page_number > g_pages_total:
                 g_page_number -= 1
-                raise Local_error("Incorrect page number")
+                raise Local_error("Это самая последняя страница")
 
             page_begin = 100 * g_page_number - 100
 
-            response = find(g_connection, skip=page_begin, limit=100)
+            response = find(g_connection,
+                            name=self.name,
+                            fname=self.fname,
+                            phone=self.phone,
+                            uid=self.uid,
+                            nik=self.nik,
+                            wo=self.wo,
+                            skip=page_begin,
+                            limit=100)
 
             self.lineEdit_pages_cur.setText(str(g_page_number))
 
@@ -230,7 +245,39 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
     def back(self):
         try:
-            print("назад")
+            global g_connection
+            global g_page_number
+            global g_pages_total
+
+            g_page_number -= 1
+
+            if g_page_number < 1:
+                g_page_number += 1
+                raise Local_error("Это самая первая страница")
+
+            page_begin = 100 * g_page_number - 100
+
+            response = find(g_connection,
+                            name=self.name,
+                            fname=self.fname,
+                            phone=self.phone,
+                            uid=self.uid,
+                            nik=self.nik,
+                            wo=self.wo,
+                            skip=page_begin,
+                            limit=100)
+
+            self.lineEdit_pages_cur.setText(str(g_page_number))
+
+            for row_number, row_value in enumerate(response):
+                for item_number, item_value in enumerate(row_value):
+                    self.tableWidget.setItem(
+                        row_number, item_number, QTableWidgetItem(
+                            list(row_value.values())[item_number])
+                    )
+                    self.tableWidget.horizontalHeaderItem(
+                        item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
+            self.tableWidget.resizeColumnsToContents()
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
 
@@ -282,17 +329,24 @@ def insert(collection, data):
         raise Local_error(str(e))
 
 
-def find(collection, _id="", fname="", phone="", nik="", skip=0, limit=0):
+def find(collection, _id="", name="", fname="", phone="",
+         uid="", nik="", wo="", skip=0, limit=0):
     try:
         request = {}
         if _id != "":
             request.update({"_id": str(_id)})
+        if name != "":
+            request.update({"name": str(name)})
         if fname != "":
             request.update({"fname": str(fname)})
         if phone != "":
             request.update({"phone": str(phone)})
+        if uid != "":
+            request.update({"uid": str(uid)})
         if nik != "":
             request.update({"nik": str(nik)})
+        if wo != "":
+            request.update({"wo": str(wo)})
 
         c = collection.find(request, skip=skip, limit=limit,
                             allow_partial_results=True)
@@ -326,12 +380,10 @@ def import_data(collection, path):
             raise Local_error("path doesn't exists")
 
         collection.drop()
-        g_current_value = 1
         g_max_value = 100
-        print("считываю длину файла..", end="")
+        g_current_value = 1
         with open(path, 'r', encoding="Windows-1251") as f:
             g_max_value = sum(1 for _ in f) - 1
-            print(".")
 
         with open(path, 'r', encoding="Windows-1251") as f:
             f.readline()
@@ -368,9 +420,10 @@ def import_data(collection, path):
                     data = []
 
                 if not g_active_import:
+                    print("останов")
                     break
 
-        print("import закончен")
+        g_current_value = 100
 
         eee = str((time() - start) / 60).split(".")
         print(eee[0] + "." + eee[1][:3] + " min")
