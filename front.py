@@ -316,7 +316,7 @@ class Ui_MainWindow(object):
 "    width: 10px;\n"
 "    margin: 0.5px;\n"
 "}")
-        self.progress_barchik.setValue(100)
+        self.progress_barchik.setValue(0)
         self.progress_barchik.setInvertedAppearance(False)
         self.progress_barchik.setTextDirection(QProgressBar.TopToBottom)
 

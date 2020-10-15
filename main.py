@@ -26,7 +26,7 @@ g_current_value = 0
 g_active_import = False
 g_active_export = False
 
-g_connection = ""
+g_collection = ""
 
 headers = ['_id', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
 
@@ -63,10 +63,10 @@ class Worker_Boris(QThread):
     def run(self):
         global g_overload_param
         global g_path_to_csv
-        global g_connection
+        global g_collection
 
         if g_overload_param == "import":
-            import_data(g_connection, g_path_to_csv)
+            import_data(g_collection, g_path_to_csv)
         elif g_overload_param == "export":
             pass  # export
 
@@ -86,6 +86,8 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
         self.button_import.clicked.connect(self.open_file_browser)
         self.button_show.clicked.connect(self.show_table)
         self.button_export.clicked.connect(self.export)
+        self.button_insert.clicked.connect(self.insert)
+        self.button_delete.clicked.connect(self.delete)
         self.button_forward.clicked.connect(self.forward)
         self.button_back.clicked.connect(self.back)
         self.button_stop.clicked.connect(self.stop)
@@ -138,7 +140,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
     def show_table(self):
         try:
-            global g_connection
+            global g_collection
             global g_page_number
             global g_pages_total
 
@@ -148,20 +150,23 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
             self.tableWidget.clear()
             self.tableWidget.setHorizontalHeaderLabels(headers)
 
-            self.name = self.lineEdit_name.text()
-            self.fname = self.lineEdit_fname.text()
-            self.phone = self.lineEdit_phone.text()
-            self.uid = self.lineEdit_uid.text()
-            self.nik = self.lineEdit_nik.text()
-            self.wo = self.lineEdit_wo.text()
+            self.name = str(self.lineEdit_name.text())
+            self.fname = str(self.lineEdit_fname.text())
+            self.phone = str(self.lineEdit_phone.text())
+            self.uid = str(self.lineEdit_uid.text())
+            self.nik = str(self.lineEdit_nik.text())
+            self.wo = str(self.lineEdit_wo.text())
 
+            input_check(self.name)
             input_check(self.fname)
             input_check(self.phone)
+            input_check(self.uid)
             input_check(self.nik)
+            input_check(self.wo)
 
             if self.name or self.fname or self.phone or \
                     self.uid or self.nik or self.wo:
-                response = find(g_connection,
+                response = find(g_collection,
                                 name=self.name,
                                 fname=self.fname,
                                 phone=self.phone,
@@ -170,8 +175,8 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                                 wo=self.wo)
                 collection_len = len(response)
             else:
-                response = find(g_connection, skip=0, limit=100)
-                collection_len = g_connection.estimated_document_count()
+                response = find(g_collection, skip=0, limit=100)
+                collection_len = g_collection.estimated_document_count()
 
             if len(response) == 0:
                 raise Local_error("Данные отсутствуют")
@@ -191,7 +196,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                 for item_number, item_value in enumerate(row_value):
                     self.tableWidget.setItem(
                         row_number, item_number, QTableWidgetItem(
-                            list(row_value.values())[item_number])
+                            str(list(row_value.values())[item_number]))
                     )
                     self.tableWidget.horizontalHeaderItem(
                         item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
@@ -205,9 +210,77 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
 
+    def insert(self):
+        try:
+            global g_collection
+            print("вставить")
+
+            self.name = str(self.lineEdit_name.text())
+            self.fname = str(self.lineEdit_fname.text())
+            self.phone = str(self.lineEdit_phone.text())
+            self.uid = str(self.lineEdit_uid.text())
+            self.nik = str(self.lineEdit_nik.text())
+            self.wo = str(self.lineEdit_wo.text())
+
+            if not self.name and not self.fname and not self.phone and \
+                    not self.uid and not self.nik and not self.wo:
+                raise Local_error("Нет данных для вставки")
+
+            input_check(self.name)
+            input_check(self.fname)
+            input_check(self.phone)
+            input_check(self.uid)
+            input_check(self.nik)
+            input_check(self.wo)
+
+            data = {"name": self.name, "fname": self.fname,
+                    "phone": self.phone, "uid": self.uid,
+                    "nik": self.nik, "wo": self.wo}
+
+            insert(g_collection, data)
+            print("добавил")
+
+        except Local_error as e:
+            self.notifier.about(self, " ", str(e))
+
+    def delete(self):
+        print("удалить")
+        try:
+            global g_collection
+            print("вставить")
+
+            self.name = str(self.lineEdit_name.text())
+            self.fname = str(self.lineEdit_fname.text())
+            self.phone = str(self.lineEdit_phone.text())
+            self.uid = str(self.lineEdit_uid.text())
+            self.nik = str(self.lineEdit_nik.text())
+            self.wo = str(self.lineEdit_wo.text())
+
+            if not self.name and not self.fname and not self.phone and \
+                    not self.uid and not self.nik and not self.wo:
+                raise Local_error("Нет данных для удаления")
+
+            input_check(self.name)
+            input_check(self.fname)
+            input_check(self.phone)
+            input_check(self.uid)
+            input_check(self.nik)
+            input_check(self.wo)
+
+            data = {"name": self.name, "fname": self.fname,
+                    "phone": self.phone, "uid": self.uid,
+                    "nik": self.nik, "wo": self.wo}
+            print(data)
+
+            delete(g_collection, data)
+            print("удалил")
+
+        except Local_error as e:
+            self.notifier.about(self, " ", str(e))
+
     def forward(self):
         try:
-            global g_connection
+            global g_collection
             global g_page_number
             global g_pages_total
 
@@ -219,7 +292,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
             page_begin = 100 * g_page_number - 100
 
-            response = find(g_connection,
+            response = find(g_collection,
                             name=self.name,
                             fname=self.fname,
                             phone=self.phone,
@@ -235,7 +308,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                 for item_number, item_value in enumerate(row_value):
                     self.tableWidget.setItem(
                         row_number, item_number, QTableWidgetItem(
-                            list(row_value.values())[item_number])
+                            str(list(row_value.values())[item_number]))
                     )
                     self.tableWidget.horizontalHeaderItem(
                         item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
@@ -245,7 +318,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
     def back(self):
         try:
-            global g_connection
+            global g_collection
             global g_page_number
             global g_pages_total
 
@@ -257,7 +330,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
             page_begin = 100 * g_page_number - 100
 
-            response = find(g_connection,
+            response = find(g_collection,
                             name=self.name,
                             fname=self.fname,
                             phone=self.phone,
@@ -273,7 +346,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                 for item_number, item_value in enumerate(row_value):
                     self.tableWidget.setItem(
                         row_number, item_number, QTableWidgetItem(
-                            list(row_value.values())[item_number])
+                            str(list(row_value.values())[item_number]))
                     )
                     self.tableWidget.horizontalHeaderItem(
                         item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
@@ -313,10 +386,10 @@ def get_script_dir(follow_symlinks=True):
 
 
 def init_collection():
-    global g_connection
+    global g_collection
     client = MongoClient()
     db = client["db"]
-    g_connection = db["collection"]
+    g_collection = db["collection"]
 
 
 def insert(collection, data):
