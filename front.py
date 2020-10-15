@@ -146,19 +146,19 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_5)
 
-        self.button_insert_2 = QPushButton(self.centralwidget)
-        self.button_insert_2.setObjectName(u"button_insert_2")
-        sizePolicy.setHeightForWidth(self.button_insert_2.sizePolicy().hasHeightForWidth())
-        self.button_insert_2.setSizePolicy(sizePolicy)
-        self.button_insert_2.setMinimumSize(QSize(240, 40))
-        self.button_insert_2.setMaximumSize(QSize(240, 40))
+        self.button_update = QPushButton(self.centralwidget)
+        self.button_update.setObjectName(u"button_update")
+        sizePolicy.setHeightForWidth(self.button_update.sizePolicy().hasHeightForWidth())
+        self.button_update.setSizePolicy(sizePolicy)
+        self.button_update.setMinimumSize(QSize(240, 40))
+        self.button_update.setMaximumSize(QSize(240, 40))
         font2 = QFont()
         font2.setFamily(u"Open Sans Light")
         font2.setPointSize(12)
         font2.setBold(True)
         font2.setWeight(75)
-        self.button_insert_2.setFont(font2)
-        self.button_insert_2.setStyleSheet(u"QPushButton {\n"
+        self.button_update.setFont(font2)
+        self.button_update.setStyleSheet(u"QPushButton {\n"
 "	border: 2px solid rgb(27, 29, 35);\n"
 "	border-radius: 20px;\n"
 "	color: #FFF;\n"
@@ -174,7 +174,7 @@ class Ui_MainWindow(object):
 "	background-color: rgb(43, 45, 56);\n"
 "}")
 
-        self.horizontalLayout_4.addWidget(self.button_insert_2)
+        self.horizontalLayout_4.addWidget(self.button_update)
 
         self.horizontalSpacer_6 = QSpacerItem(64, 20, QSizePolicy.Preferred, QSizePolicy.Minimum)
 
@@ -750,7 +750,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"parser", None))
-        self.button_insert_2.setText(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f", None))
+        self.button_update.setText(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f", None))
         self.button_back.setText(QCoreApplication.translate("MainWindow", u"\u041d\u0430\u0437\u0430\u0434", None))
         self.lineEdit_pages_cur.setText(QCoreApplication.translate("MainWindow", u"0", None))
         self.label_static.setText(QCoreApplication.translate("MainWindow", u"\u0438\u0437", None))

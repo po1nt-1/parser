@@ -1,8 +1,5 @@
 import inspect
-import json
-import multiprocessing as mp
 import os
-import re
 import sys
 import time
 
@@ -18,7 +15,6 @@ import front
 
 g_path_to_csv = ""
 
-g_overload_param = ""
 
 g_max_value = 2
 g_current_value = 0
@@ -61,15 +57,12 @@ class Worker_Boris(QThread):
         super(Worker_Boris, self).__init__(parent)
 
     def run(self):
-        global g_overload_param
         global g_path_to_csv
         global g_collection
 
         try:
-            if g_overload_param == "import":
-                import_data(g_collection, g_path_to_csv)
-            elif g_overload_param == "export":
-                pass  # export
+            import_data(g_collection, g_path_to_csv)
+
         except Local_error as e:
             pass
 
@@ -81,6 +74,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
         self.worker_importer = Worker_Boris()
         self.worker_bar = Worker_bar()
+
         init_collection()
 
         self.progress_barchik.setValue(0)
@@ -89,22 +83,23 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
         self.button_import.clicked.connect(self.open_file_browser)
         self.button_show.clicked.connect(self.show_table)
         self.button_export.clicked.connect(self.export)
+        self.button_update.clicked.connect(self.update)
         self.button_insert.clicked.connect(self.insert)
         self.button_delete.clicked.connect(self.delete)
         self.button_forward.clicked.connect(self.forward)
         self.button_back.clicked.connect(self.back)
         self.button_stop.clicked.connect(self.stop)
 
-        #           ###  ###############  #           ###
-        #       ####     #                #       ####
-        # ######         ###############  # ######
-        #       ####     #                #       ####
-        #           ###  ###############  #           ###
+        self.name = ""
+        self.fname = ""
+        self.phone = ""
+        self.uid = ""
+        self.nik = ""
+        self.wo = ""
 
     def open_file_browser(self):
         try:
             global g_path_to_csv
-            global g_overload_param
 
             global g_active_import
 
@@ -127,7 +122,6 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                 self.progress_barchik.setValue(0)
                 self.worker_bar.updateProgress.connect(self.setProgress)
 
-                g_overload_param = "import"
                 self.worker_importer.start()
                 self.worker_bar.start()
         except Local_error as e:
@@ -153,19 +147,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
             self.tableWidget.clear()
             self.tableWidget.setHorizontalHeaderLabels(headers)
 
-            self.name = str(self.lineEdit_name.text())
-            self.fname = str(self.lineEdit_fname.text())
-            self.phone = str(self.lineEdit_phone.text())
-            self.uid = str(self.lineEdit_uid.text())
-            self.nik = str(self.lineEdit_nik.text())
-            self.wo = str(self.lineEdit_wo.text())
-
-            input_check(self.name)
-            input_check(self.fname)
-            input_check(self.phone)
-            input_check(self.uid)
-            input_check(self.nik)
-            input_check(self.wo)
+            self.get_input()
 
             if self.name or self.fname or self.phone or \
                     self.uid or self.nik or self.wo:
@@ -176,6 +158,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                                 uid=self.uid,
                                 nik=self.nik,
                                 wo=self.wo)
+
                 collection_len = len(response)
             else:
                 response = find(g_collection, skip=0, limit=100)
@@ -195,46 +178,74 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
             self.lineEdit_pages_cur.setText(str(g_page_number))
             self.lineEdit_pages_max.setText(str(g_pages_total))
 
-            for row_number, row_value in enumerate(response):
-                for item_number, item_value in enumerate(row_value):
-                    self.tableWidget.setItem(
-                        row_number, item_number, QTableWidgetItem(
-                            str(list(row_value.values())[item_number]))
-                    )
-                    self.tableWidget.horizontalHeaderItem(
-                        item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
-            self.tableWidget.resizeColumnsToContents()
+            self.load_page(response)
+        except Local_error as e:
+            self.notifier.about(self, " ", str(e))
+
+    def update(self):
+        try:
+            global g_collection
+            global headers
+
+            rowCount = self.tableWidget.rowCount()
+            columnCount = self.tableWidget.columnCount()
+
+            for row_i in range(rowCount):
+                rowData = []
+                for column_j in range(columnCount):
+                    widgetItem = self.tableWidget.item(row_i, column_j)
+                    if widgetItem and widgetItem.text:
+                        text_field = widgetItem.text()
+
+                        input_check(text_field)
+
+                        rowData.append(text_field)
+                    else:
+                        rowData.append('')
+
+                check_1 = ''.join(rowData)
+                if not check_1 or not rowData[0]:
+                    raise Local_error("Нет данных для сохранения")
+
+                data = dict(zip(headers, rowData))
+                data = [data.pop("_id"), data]
+
+                replace(g_collection, data[0], data[1])
+
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
 
     def export(self):
         try:
-            print("экспорт")
+            global g_collection
+
+            self.get_input()
+
+            if self.name or self.fname or self.phone or \
+                    self.uid or self.nik or self.wo:
+                response = find(g_collection,
+                                name=self.name,
+                                fname=self.fname,
+                                phone=self.phone,
+                                uid=self.uid,
+                                nik=self.nik,
+                                wo=self.wo)
+            else:
+                raise Local_error("Не отобраны данные для экспорта")
+            export_data(g_collection, response)
+
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
 
     def insert(self):
         try:
             global g_collection
-            print("вставить")
 
-            self.name = str(self.lineEdit_name.text())
-            self.fname = str(self.lineEdit_fname.text())
-            self.phone = str(self.lineEdit_phone.text())
-            self.uid = str(self.lineEdit_uid.text())
-            self.nik = str(self.lineEdit_nik.text())
-            self.wo = str(self.lineEdit_wo.text())
+            self.get_input()
 
             if not self.name and not self.fname and not self.phone and \
                     not self.uid and not self.nik and not self.wo:
                 raise Local_error("Нет данных для вставки")
-
-            input_check(self.name)
-            input_check(self.fname)
-            input_check(self.phone)
-            input_check(self.uid)
-            input_check(self.nik)
-            input_check(self.wo)
 
             insert(g_collection,
                    name=self.name,
@@ -243,33 +254,19 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                    uid=self.uid,
                    nik=self.nik,
                    wo=self.wo)
-            print("добавил")
 
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
 
     def delete(self):
-        print("удалить")
         try:
             global g_collection
 
-            self.name = str(self.lineEdit_name.text())
-            self.fname = str(self.lineEdit_fname.text())
-            self.phone = str(self.lineEdit_phone.text())
-            self.uid = str(self.lineEdit_uid.text())
-            self.nik = str(self.lineEdit_nik.text())
-            self.wo = str(self.lineEdit_wo.text())
+            self.get_input()
 
             if not self.name and not self.fname and not self.phone and \
                     not self.uid and not self.nik and not self.wo:
                 raise Local_error("Нет данных для удаления")
-
-            input_check(self.name)
-            input_check(self.fname)
-            input_check(self.phone)
-            input_check(self.uid)
-            input_check(self.nik)
-            input_check(self.wo)
 
             data = {"name": self.name, "fname": self.fname,
                     "phone": self.phone, "uid": self.uid,
@@ -282,7 +279,6 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                    uid=self.uid,
                    nik=self.nik,
                    wo=self.wo)
-            print("удалил")
 
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
@@ -313,15 +309,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
             self.lineEdit_pages_cur.setText(str(g_page_number))
 
-            for row_number, row_value in enumerate(response):
-                for item_number, item_value in enumerate(row_value):
-                    self.tableWidget.setItem(
-                        row_number, item_number, QTableWidgetItem(
-                            str(list(row_value.values())[item_number]))
-                    )
-                    self.tableWidget.horizontalHeaderItem(
-                        item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
-            self.tableWidget.resizeColumnsToContents()
+            self.load_page(response)
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
 
@@ -351,17 +339,46 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
             self.lineEdit_pages_cur.setText(str(g_page_number))
 
-            for row_number, row_value in enumerate(response):
-                for item_number, item_value in enumerate(row_value):
-                    self.tableWidget.setItem(
-                        row_number, item_number, QTableWidgetItem(
-                            str(list(row_value.values())[item_number]))
-                    )
-                    self.tableWidget.horizontalHeaderItem(
-                        item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
-            self.tableWidget.resizeColumnsToContents()
+            self.load_page(response)
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
+
+    def load_page(self, response):
+        for row_number, row_value in enumerate(response):
+            for item_number, item_value in enumerate(row_value):
+                cell_value = QTableWidgetItem(
+                    str(list(row_value.values())[item_number]))
+
+                self.tableWidget.setItem(row_number, item_number, cell_value)
+
+                if item_number == 0:
+                    item = QTableWidgetItem()
+                    item.setText(str(list(row_value.values())[item_number]))
+                    item.setFlags(QtCore.Qt.ItemIsEnabled)
+                    self.tableWidget.setItem(row_number, item_number, item)
+
+                self.tableWidget.horizontalHeaderItem(
+                    item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
+
+        self.tableWidget.resizeColumnsToContents()
+
+    def get_input(self):
+        try:
+            self.name = str(self.lineEdit_name.text())
+            self.fname = str(self.lineEdit_fname.text())
+            self.phone = str(self.lineEdit_phone.text())
+            self.uid = str(self.lineEdit_uid.text())
+            self.nik = str(self.lineEdit_nik.text())
+            self.wo = str(self.lineEdit_wo.text())
+
+            input_check(self.name)
+            input_check(self.fname)
+            input_check(self.phone)
+            input_check(self.uid)
+            input_check(self.nik)
+            input_check(self.wo)
+        except Local_error as e:
+            raise(Local_error(str(e)))
 
     def stop(self):
         global g_active_import
@@ -385,7 +402,7 @@ def get_percent():
 def get_script_dir(follow_symlinks=True):
     '''получить директорию со исполняемым скриптом'''
     # https://clck.ru/P8NUA
-    if getattr(sys, 'frozen', False):  # type: ignore
+    if getattr(sys, 'frozen', False):
         path = os.path.abspath(sys.executable)
     else:
         path = inspect.getabsfile(get_script_dir)
@@ -515,7 +532,7 @@ def import_data(collection, path):
 
             from time import time
             start = time()
-            print("начало в ", start)
+
             g_current_value = 0
             for line in f:
                 g_current_value += 1
@@ -543,22 +560,21 @@ def import_data(collection, path):
                     data = []
 
                 if not g_active_import:
-                    print("останов")
                     break
 
         g_current_value = 100
 
-        eee = str((time() - start) / 60).split(".")
-        print(eee[0] + "." + eee[1][:3] + " min")
+        total_time = str((time() - start) / 60).split(".")
+        print(eee[0] + "." + total_time[1][:3] + " min")
     except Local_error as e:
         raise Local_error(str(e))
     finally:
         g_active_import = False
 
 
-def export_data_master(collection, path, data_in):
+def export_data(collection, data_in):
     data_out = []
-    with open(path, 'w', encoding="utf-8") as f:
+    with open(gen_new_csv_name(), 'w', encoding="utf-8") as f:
         data_out.append("_id,name,fname,phone,uid,nik,wo\n")
         for line in data_in:
             data_out.append(f'{line["_id"]},{line["name"]},' +
@@ -577,7 +593,8 @@ def gen_new_csv_name():
     i = 1
     while f"result{i}.csv" in files:
         i += 1
-    return f"result{i}.csv"
+
+    return os.path.join(path, f"result{i}.csv")
 
 
 def input_check(data):
@@ -585,7 +602,7 @@ def input_check(data):
         if "," in data or "|" in data or "\n" in data:
             raise Local_error(
                 f"'{data}' contains an unsupported" +
-                "symbol: \n{','; '|'; '\\n'}")
+                """symbol: \n < , > < | > < \\n > < ' > < " >""")
     else:
         raise Local_error(f"'{data}' is not a string")
 
