@@ -65,10 +65,13 @@ class Worker_Boris(QThread):
         global g_path_to_csv
         global g_collection
 
-        if g_overload_param == "import":
-            import_data(g_collection, g_path_to_csv)
-        elif g_overload_param == "export":
-            pass  # export
+        try:
+            if g_overload_param == "import":
+                import_data(g_collection, g_path_to_csv)
+            elif g_overload_param == "export":
+                pass  # export
+        except Local_error as e:
+            pass
 
 
 class MyQtApp(front.Ui_MainWindow, QMainWindow):
@@ -233,11 +236,13 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
             input_check(self.nik)
             input_check(self.wo)
 
-            data = {"name": self.name, "fname": self.fname,
-                    "phone": self.phone, "uid": self.uid,
-                    "nik": self.nik, "wo": self.wo}
-
-            insert(g_collection, data)
+            insert(g_collection,
+                   name=self.name,
+                   fname=self.fname,
+                   phone=self.phone,
+                   uid=self.uid,
+                   nik=self.nik,
+                   wo=self.wo)
             print("добавил")
 
         except Local_error as e:
@@ -247,7 +252,6 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
         print("удалить")
         try:
             global g_collection
-            print("вставить")
 
             self.name = str(self.lineEdit_name.text())
             self.fname = str(self.lineEdit_fname.text())
@@ -270,9 +274,14 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
             data = {"name": self.name, "fname": self.fname,
                     "phone": self.phone, "uid": self.uid,
                     "nik": self.nik, "wo": self.wo}
-            print(data)
 
-            delete(g_collection, data)
+            delete(g_collection,
+                   name=self.name,
+                   fname=self.fname,
+                   phone=self.phone,
+                   uid=self.uid,
+                   nik=self.nik,
+                   wo=self.wo)
             print("удалил")
 
         except Local_error as e:
@@ -392,14 +401,34 @@ def init_collection():
     g_collection = db["collection"]
 
 
-def insert(collection, data):
+def insert(collection, _id="", name="", fname="", phone="",
+           uid="", nik="", wo="", data=None):
     try:
-        if not isinstance(data, list):
-            collection.insert_one(data)
+        if data is None:
+            request = {}
+            if _id != "":
+                request.update({"_id": str(_id)})
+            if name != "":
+                request.update({"name": str(name)})
+            if fname != "":
+                request.update({"fname": str(fname)})
+            if phone != "":
+                request.update({"phone": str(phone)})
+            if uid != "":
+                request.update({"uid": str(uid)})
+            if nik != "":
+                request.update({"nik": str(nik)})
+            if wo != "":
+                request.update({"wo": str(wo)})
+
+            collection.insert_one(request)
         else:
             collection.insert_many(data)
     except errors.InvalidDocument as e:
         raise Local_error(str(e))
+    except pymongo.errors.BulkWriteError:
+        raise Local_error(
+            "В файле не должно быть\nповторяющихся полей '_id'")
 
 
 def find(collection, _id="", name="", fname="", phone="",
@@ -425,9 +454,9 @@ def find(collection, _id="", name="", fname="", phone="",
                             allow_partial_results=True)
 
         data = [i for i in c]
+        return data
     except pymongo.errors.OperationFailure as e:
         raise Local_error(str(e))
-    return data
 
 
 def replace(collection, _id, data):
@@ -437,8 +466,28 @@ def replace(collection, _id, data):
     collection.replace_one({'_id': str(_id)}, data_pull)
 
 
-def delete(collection, data):
-    collection.delete_one(data)
+def delete(collection, _id="", name="", fname="", phone="",
+           uid="", nik="", wo=""):
+    try:
+        request = {}
+        if _id != "":
+            request.update({"_id": str(_id)})
+        if name != "":
+            request.update({"name": str(name)})
+        if fname != "":
+            request.update({"fname": str(fname)})
+        if phone != "":
+            request.update({"phone": str(phone)})
+        if uid != "":
+            request.update({"uid": str(uid)})
+        if nik != "":
+            request.update({"nik": str(nik)})
+        if wo != "":
+            request.update({"wo": str(wo)})
+
+        a = collection.delete_one(request)
+    except pymongo.errors.OperationFailure as e:
+        raise Local_error(str(e))
 
 
 def import_data(collection, path):
@@ -466,6 +515,7 @@ def import_data(collection, path):
 
             from time import time
             start = time()
+            print("начало в ", start)
             g_current_value = 0
             for line in f:
                 g_current_value += 1
@@ -481,13 +531,13 @@ def import_data(collection, path):
 
                 if g_current_value % block == 0:
                     data.sort(key=lambda field: int(field['_id']))
-                    insert(collection, data)
+                    insert(collection, data=data)
 
                     data = []
 
                 elif g_current_value >= g_max_value:
                     data.sort(key=lambda field: int(field['_id']))
-                    insert(collection, data)
+                    insert(collection, data=data)
 
                     iter_data = {}
                     data = []
@@ -500,6 +550,8 @@ def import_data(collection, path):
 
         eee = str((time() - start) / 60).split(".")
         print(eee[0] + "." + eee[1][:3] + " min")
+    except Local_error as e:
+        raise Local_error(str(e))
     finally:
         g_active_import = False
 
