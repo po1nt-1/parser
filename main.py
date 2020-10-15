@@ -12,7 +12,7 @@ from pymongo import MongoClient
 from PySide2 import QtCore
 from PySide2.QtCore import QThread, Signal
 from PySide2.QtWidgets import (QApplication, QFileDialog, QMainWindow,
-                               QMessageBox, QTableWidgetItem)
+                               QMessageBox, QTableWidget, QTableWidgetItem)
 
 import front
 
@@ -196,20 +196,43 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
             self.lineEdit_pages_cur.setText(str(g_page_number))
             self.lineEdit_pages_max.setText(str(g_pages_total))
 
-            for row_number, row_value in enumerate(response):
-                for item_number, item_value in enumerate(row_value):
-                    self.tableWidget.setItem(
-                        row_number, item_number, QTableWidgetItem(
-                            str(list(row_value.values())[item_number]))
-                    )
-                    self.tableWidget.horizontalHeaderItem(
-                        item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
-            self.tableWidget.resizeColumnsToContents()
+            self.load_page(response)
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
 
     def update(self):
-        pass
+        try:
+            global g_collection
+            global headers
+            print("вставить")
+
+            rowCount = self.tableWidget.rowCount()
+            columnCount = self.tableWidget.columnCount()
+
+            for row_i in range(rowCount):
+                rowData = []
+                for column_j in range(columnCount):
+                    widgetItem = self.tableWidget.item(row_i, column_j)
+                    if widgetItem and widgetItem.text:
+                        text_field = widgetItem.text()
+
+                        input_check(text_field)
+
+                        rowData.append(text_field)
+                    else:
+                        rowData.append('')
+
+                check_1 = ''.join(rowData)
+                if not check_1 or not rowData[0]:
+                    raise Local_error("Нет данных для сохранения")
+
+                data = dict(zip(headers, rowData))
+                data = [data.pop("_id"), data]
+
+                replace(g_collection, data[0], data[1])
+
+        except Local_error as e:
+            self.notifier.about(self, " ", str(e))
 
     def export(self):
         try:
@@ -317,15 +340,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
             self.lineEdit_pages_cur.setText(str(g_page_number))
 
-            for row_number, row_value in enumerate(response):
-                for item_number, item_value in enumerate(row_value):
-                    self.tableWidget.setItem(
-                        row_number, item_number, QTableWidgetItem(
-                            str(list(row_value.values())[item_number]))
-                    )
-                    self.tableWidget.horizontalHeaderItem(
-                        item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
-            self.tableWidget.resizeColumnsToContents()
+            self.load_page(response)
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
 
@@ -355,17 +370,27 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
             self.lineEdit_pages_cur.setText(str(g_page_number))
 
-            for row_number, row_value in enumerate(response):
-                for item_number, item_value in enumerate(row_value):
-                    self.tableWidget.setItem(
-                        row_number, item_number, QTableWidgetItem(
-                            str(list(row_value.values())[item_number]))
-                    )
-                    self.tableWidget.horizontalHeaderItem(
-                        item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
-            self.tableWidget.resizeColumnsToContents()
+            self.load_page(response)
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
+
+    def load_page(self, response):
+        for row_number, row_value in enumerate(response):
+            for item_number, item_value in enumerate(row_value):
+                cell_value = QTableWidgetItem(
+                        str(list(row_value.values())[item_number]))
+                self.tableWidget.setItem(row_number, item_number, cell_value)
+
+                if item_number == 0:
+                    item = QTableWidgetItem()
+                    item.setText(str(list(row_value.values())[item_number]))
+                    item.setFlags(QtCore.Qt.ItemIsEnabled)
+                    self.tableWidget.setItem(row_number, item_number, item)
+
+                self.tableWidget.horizontalHeaderItem(
+                    item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
+
+        self.tableWidget.resizeColumnsToContents()
 
     def stop(self):
         global g_active_import
@@ -589,7 +614,7 @@ def input_check(data):
         if "," in data or "|" in data or "\n" in data:
             raise Local_error(
                 f"'{data}' contains an unsupported" +
-                "symbol: \n{','; '|'; '\\n'}")
+                """symbol: \n < , > < | > < \\n > < ' > < " >""")
     else:
         raise Local_error(f"'{data}' is not a string")
 
