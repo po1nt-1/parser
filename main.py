@@ -1,8 +1,5 @@
 import inspect
-import json
-import multiprocessing as mp
 import os
-import re
 import sys
 import time
 
@@ -12,13 +9,12 @@ from pymongo import MongoClient
 from PySide2 import QtCore
 from PySide2.QtCore import QThread, Signal
 from PySide2.QtWidgets import (QApplication, QFileDialog, QMainWindow,
-                               QMessageBox, QTableWidget, QTableWidgetItem)
+                               QMessageBox, QTableWidgetItem)
 
 import front
 
 g_path_to_csv = ""
 
-g_overload_param = ""
 
 g_max_value = 2
 g_current_value = 0
@@ -61,15 +57,12 @@ class Worker_Boris(QThread):
         super(Worker_Boris, self).__init__(parent)
 
     def run(self):
-        global g_overload_param
         global g_path_to_csv
         global g_collection
 
         try:
-            if g_overload_param == "import":
-                import_data(g_collection, g_path_to_csv)
-            elif g_overload_param == "export":
-                pass  # export
+            import_data(g_collection, g_path_to_csv)
+
         except Local_error as e:
             pass
 
@@ -81,6 +74,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
         self.worker_importer = Worker_Boris()
         self.worker_bar = Worker_bar()
+
         init_collection()
 
         self.progress_barchik.setValue(0)
@@ -96,16 +90,16 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
         self.button_back.clicked.connect(self.back)
         self.button_stop.clicked.connect(self.stop)
 
-        #           ###  ###############  #           ###
-        #       ####     #                #       ####
-        # ######         ###############  # ######
-        #       ####     #                #       ####
-        #           ###  ###############  #           ###
+        self.name = ""
+        self.fname = ""
+        self.phone = ""
+        self.uid = ""
+        self.nik = ""
+        self.wo = ""
 
     def open_file_browser(self):
         try:
             global g_path_to_csv
-            global g_overload_param
 
             global g_active_import
 
@@ -128,7 +122,6 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                 self.progress_barchik.setValue(0)
                 self.worker_bar.updateProgress.connect(self.setProgress)
 
-                g_overload_param = "import"
                 self.worker_importer.start()
                 self.worker_bar.start()
         except Local_error as e:
@@ -154,19 +147,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
             self.tableWidget.clear()
             self.tableWidget.setHorizontalHeaderLabels(headers)
 
-            self.name = str(self.lineEdit_name.text())
-            self.fname = str(self.lineEdit_fname.text())
-            self.phone = str(self.lineEdit_phone.text())
-            self.uid = str(self.lineEdit_uid.text())
-            self.nik = str(self.lineEdit_nik.text())
-            self.wo = str(self.lineEdit_wo.text())
-
-            input_check(self.name)
-            input_check(self.fname)
-            input_check(self.phone)
-            input_check(self.uid)
-            input_check(self.nik)
-            input_check(self.wo)
+            self.get_input()
 
             if self.name or self.fname or self.phone or \
                     self.uid or self.nik or self.wo:
@@ -177,6 +158,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                                 uid=self.uid,
                                 nik=self.nik,
                                 wo=self.wo)
+
                 collection_len = len(response)
             else:
                 response = find(g_collection, skip=0, limit=100)
@@ -204,7 +186,6 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
         try:
             global g_collection
             global headers
-            print("вставить")
 
             rowCount = self.tableWidget.rowCount()
             columnCount = self.tableWidget.columnCount()
@@ -236,32 +217,35 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
 
     def export(self):
         try:
-            print("экспорт")
+            global g_collection
+
+            self.get_input()
+
+            if self.name or self.fname or self.phone or \
+                    self.uid or self.nik or self.wo:
+                response = find(g_collection,
+                                name=self.name,
+                                fname=self.fname,
+                                phone=self.phone,
+                                uid=self.uid,
+                                nik=self.nik,
+                                wo=self.wo)
+            else:
+                raise Local_error("Не отобраны данные для экспорта")
+            export_data(g_collection, response)
+
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
 
     def insert(self):
         try:
             global g_collection
-            print("вставить")
 
-            self.name = str(self.lineEdit_name.text())
-            self.fname = str(self.lineEdit_fname.text())
-            self.phone = str(self.lineEdit_phone.text())
-            self.uid = str(self.lineEdit_uid.text())
-            self.nik = str(self.lineEdit_nik.text())
-            self.wo = str(self.lineEdit_wo.text())
+            self.get_input()
 
             if not self.name and not self.fname and not self.phone and \
                     not self.uid and not self.nik and not self.wo:
                 raise Local_error("Нет данных для вставки")
-
-            input_check(self.name)
-            input_check(self.fname)
-            input_check(self.phone)
-            input_check(self.uid)
-            input_check(self.nik)
-            input_check(self.wo)
 
             insert(g_collection,
                    name=self.name,
@@ -270,33 +254,19 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                    uid=self.uid,
                    nik=self.nik,
                    wo=self.wo)
-            print("добавил")
 
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
 
     def delete(self):
-        print("удалить")
         try:
             global g_collection
 
-            self.name = str(self.lineEdit_name.text())
-            self.fname = str(self.lineEdit_fname.text())
-            self.phone = str(self.lineEdit_phone.text())
-            self.uid = str(self.lineEdit_uid.text())
-            self.nik = str(self.lineEdit_nik.text())
-            self.wo = str(self.lineEdit_wo.text())
+            self.get_input()
 
             if not self.name and not self.fname and not self.phone and \
                     not self.uid and not self.nik and not self.wo:
                 raise Local_error("Нет данных для удаления")
-
-            input_check(self.name)
-            input_check(self.fname)
-            input_check(self.phone)
-            input_check(self.uid)
-            input_check(self.nik)
-            input_check(self.wo)
 
             data = {"name": self.name, "fname": self.fname,
                     "phone": self.phone, "uid": self.uid,
@@ -309,7 +279,6 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                    uid=self.uid,
                    nik=self.nik,
                    wo=self.wo)
-            print("удалил")
 
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
@@ -378,7 +347,8 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
         for row_number, row_value in enumerate(response):
             for item_number, item_value in enumerate(row_value):
                 cell_value = QTableWidgetItem(
-                        str(list(row_value.values())[item_number]))
+                    str(list(row_value.values())[item_number]))
+
                 self.tableWidget.setItem(row_number, item_number, cell_value)
 
                 if item_number == 0:
@@ -391,6 +361,24 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                     item_number).setTextAlignment(QtCore.Qt.AlignHCenter)
 
         self.tableWidget.resizeColumnsToContents()
+
+    def get_input(self):
+        try:
+            self.name = str(self.lineEdit_name.text())
+            self.fname = str(self.lineEdit_fname.text())
+            self.phone = str(self.lineEdit_phone.text())
+            self.uid = str(self.lineEdit_uid.text())
+            self.nik = str(self.lineEdit_nik.text())
+            self.wo = str(self.lineEdit_wo.text())
+
+            input_check(self.name)
+            input_check(self.fname)
+            input_check(self.phone)
+            input_check(self.uid)
+            input_check(self.nik)
+            input_check(self.wo)
+        except Local_error as e:
+            raise(Local_error(str(e)))
 
     def stop(self):
         global g_active_import
@@ -414,7 +402,7 @@ def get_percent():
 def get_script_dir(follow_symlinks=True):
     '''получить директорию со исполняемым скриптом'''
     # https://clck.ru/P8NUA
-    if getattr(sys, 'frozen', False):  # type: ignore
+    if getattr(sys, 'frozen', False):
         path = os.path.abspath(sys.executable)
     else:
         path = inspect.getabsfile(get_script_dir)
@@ -544,7 +532,7 @@ def import_data(collection, path):
 
             from time import time
             start = time()
-            print("начало в ", start)
+
             g_current_value = 0
             for line in f:
                 g_current_value += 1
@@ -572,22 +560,21 @@ def import_data(collection, path):
                     data = []
 
                 if not g_active_import:
-                    print("останов")
                     break
 
         g_current_value = 100
 
-        eee = str((time() - start) / 60).split(".")
-        print(eee[0] + "." + eee[1][:3] + " min")
+        total_time = str((time() - start) / 60).split(".")
+        print(eee[0] + "." + total_time[1][:3] + " min")
     except Local_error as e:
         raise Local_error(str(e))
     finally:
         g_active_import = False
 
 
-def export_data_master(collection, path, data_in):
+def export_data(collection, data_in):
     data_out = []
-    with open(path, 'w', encoding="utf-8") as f:
+    with open(gen_new_csv_name(), 'w', encoding="utf-8") as f:
         data_out.append("_id,name,fname,phone,uid,nik,wo\n")
         for line in data_in:
             data_out.append(f'{line["_id"]},{line["name"]},' +
@@ -606,7 +593,8 @@ def gen_new_csv_name():
     i = 1
     while f"result{i}.csv" in files:
         i += 1
-    return f"result{i}.csv"
+
+    return os.path.join(path, f"result{i}.csv")
 
 
 def input_check(data):
