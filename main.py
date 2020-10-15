@@ -89,6 +89,7 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
         self.button_import.clicked.connect(self.open_file_browser)
         self.button_show.clicked.connect(self.show_table)
         self.button_export.clicked.connect(self.export)
+        self.button_update.clicked.connect(self.update)
         self.button_insert.clicked.connect(self.insert)
         self.button_delete.clicked.connect(self.delete)
         self.button_forward.clicked.connect(self.forward)
@@ -206,6 +207,9 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
             self.tableWidget.resizeColumnsToContents()
         except Local_error as e:
             self.notifier.about(self, " ", str(e))
+
+    def update(self):
+        pass
 
     def export(self):
         try:
