@@ -215,17 +215,15 @@ class Ui_MainWindow(object):
 "	padding-right: 20px;\n"
 "	background-color: rgb(34, 36, 44);\n"
 "}\n"
-"QLineEdit:hover {\n"
+"QPushButton:hover {\n"
 "	border: 2px solid rgb(48, 50, 62);\n"
 "}\n"
-"QLineEdit:focus {\n"
+"QPushButton:focus {\n"
 "	border: 2px solid rgb(85, 170, 255);\n"
 "	background-color: rgb(43, 45, 56);\n"
 "}")
-        self.lineEdit_fname.setCursorMoveStyle(Qt.LogicalMoveStyle)
-        self.lineEdit_fname.setClearButtonEnabled(True)
 
-        self.verticalLayout.addWidget(self.lineEdit_fname)
+        self.horizontalLayout.addWidget(self.button_back)
 
         self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -273,14 +271,13 @@ class Ui_MainWindow(object):
 "	padding-right: 20px;\n"
 "	background-color: rgb(34, 36, 44);\n"
 "}\n"
-"QLineEdit:hover {\n"
+"QLabel:hover {\n"
 "	border: 2px solid rgb(48, 50, 62);\n"
 "}\n"
-"QLineEdit:focus {\n"
+"QLabel:focus {\n"
 "	border: 2px solid rgb(85, 170, 255);\n"
 "	background-color: rgb(43, 45, 56);\n"
 "}")
-        self.lineEdit_phone.setClearButtonEnabled(True)
 
         self.horizontalLayout.addWidget(self.label_static)
 

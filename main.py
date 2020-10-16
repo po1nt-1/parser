@@ -204,8 +204,8 @@ class MyQtApp(front.Ui_MainWindow, QMainWindow):
                         rowData.append('')
 
                 check_1 = ''.join(rowData)
-                if not check_1 or not rowData[0]:
-                    raise Local_error("Нет данных для сохранения")
+                if not check_1:
+                    pass
 
                 data = dict(zip(headers, rowData))
                 data = [data.pop("_id"), data]
@@ -565,7 +565,7 @@ def import_data(collection, path):
         g_current_value = 100
 
         total_time = str((time() - start) / 60).split(".")
-        print(eee[0] + "." + total_time[1][:3] + " min")
+        print(total_time[0] + "." + total_time[1][:3] + " min")
     except Local_error as e:
         raise Local_error(str(e))
     finally:
@@ -599,7 +599,8 @@ def gen_new_csv_name():
 
 def input_check(data):
     if isinstance(data, str):
-        if "," in data or "|" in data or "\n" in data:
+        if "," in data or "|" in data or "\n" in data \
+                or "'" in data or '"' in data:
             raise Local_error(
                 f"'{data}' contains an unsupported" +
                 """symbol: \n < , > < | > < \\n > < ' > < " >""")
